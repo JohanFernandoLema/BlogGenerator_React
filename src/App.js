@@ -4,18 +4,24 @@ import HomePage from './pages/HomePage'
 import ArticlePage from './pages/ArticlePage'
 import ArticlesListPage from './pages/ArticlesListPage'
 import AboutPage from './pages/AboutPage'
+import NavBar from './NavBar'
 
 function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <h1>Why working out is important!</h1>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/articles" element={<ArticlePage />} />
-          <Route path="/articles/:articleId " element={<ArticlesListPage />} />
-        </Routes>
+        <NavBar />
+        <div id="page-body">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/articles" element={<ArticlePage />} />
+            <Route
+              path="/articles/:articleId "
+              element={<ArticlesListPage />}
+            />
+          </Routes>
+        </div>
       </div>
     </BrowserRouter>
   )
