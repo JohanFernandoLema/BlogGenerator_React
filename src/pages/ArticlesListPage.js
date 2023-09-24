@@ -1,4 +1,4 @@
 const ArticlesListPage = () => {
-  return <div>ArticlesListPage</div>
+  return <h1>ArticlesListPage</h1>
 }
 export default ArticlesListPage
