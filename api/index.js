@@ -1,12 +1,7 @@
 import express from 'express'
+import { MongoClient } from 'mongodb'
 
 const app = express()
-
-const articlesInfo = [
-  { name: 'learn-react', upvotes: 0, comments: [] },
-  { name: 'learn-node', upvotes: 0, comments: [] },
-  { name: 'learn-mongoDB', upvotes: 0, comments: [] },
-]
 
 //Middleware
 // This middleware is for reading json data
@@ -20,6 +15,24 @@ const PORT = 5000
 //   const { name } = req.params
 //   res.send(`Hello my friend ${name}`)
 // })
+
+app.get('/api/articles/:name', async (req, res) => {
+  const { name } = req.params
+
+  const client = new MongoClient('mongodb://127.0.0.1:27017/react-blog-db')
+  await client.connect()
+
+  const db = client.db()
+
+  const article = await db.collection('articles').findOne({ name })
+
+  if (article) {
+    res.json(article)
+  } else {
+    res.sendStatus(404)
+  }
+})
+
 app.put('/api/articles/:name/upvote', (req, res) => {
   const { name } = req.params
   const article = articlesInfo.find((a) => a.name === name)
