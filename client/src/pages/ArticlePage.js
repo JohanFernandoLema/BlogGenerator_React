@@ -17,8 +17,14 @@ const ArticlePage = () => {
     // setArticleInfo({ upvotes: 5, comments: [] })
     newArticleInfo()
   }, [])
+
   const article = articles.find((article) => article.name === articleId)
 
+  const addUpvote = async () => {
+    const res = await axios.put(`/api/articles/${articleId}/upvote`)
+    const updatedArticle = res.data
+    setArticleInfo(updatedArticle)
+  }
   if (!article) {
     return (
       <>
@@ -29,9 +35,12 @@ const ArticlePage = () => {
   return (
     <>
       <h1>{article.title}</h1>
-      <h6>
-        This {article.name} has {articleInfo.upvotes} upvote(s)
-      </h6>
+      <div className="upvotes-section">
+        <button onClick={addUpvote}>Upvote</button>
+        <h6>
+          This {article.name} has {articleInfo.upvotes} upvote(s)
+        </h6>
+      </div>
       {article.content.map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
