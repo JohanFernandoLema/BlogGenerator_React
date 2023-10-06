@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import CommentsList from '../components/CommentsList'
 import articles from './article-content'
 import NotFoundPage from './NotFoundPage'
+import AddComments from '../components/AddComments.js'
 
 const ArticlePage = () => {
   const [articleInfo, setArticleInfo] = useState({ upvotes: 0, comments: [] })
@@ -44,6 +45,10 @@ const ArticlePage = () => {
       {article.content.map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
+      <AddComments
+        articleId={articleId}
+        updatedArticle={(updatedArticle) => setArticleInfo(updatedArticle)}
+      />
       <CommentsList comments={articleInfo.comments} />
     </>
   )
