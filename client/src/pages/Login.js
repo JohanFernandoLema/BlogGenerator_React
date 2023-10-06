@@ -5,7 +5,7 @@ const Login = () => {
       <div>
         Input your credentials down here
         <h4>Do not have an account?</h4>
-        <Link to={'/register-account'}>
+        <Link to={'/register'}>
           <button>Register</button>
         </Link>
       </div>
