@@ -15,7 +15,11 @@ const ArticlePage = () => {
 
   useEffect(() => {
     const newArticleInfo = async () => {
-      const res = await axios.get(`/api/articles/${articleId}`)
+      const token = user && (await user.getIdToken())
+      const headers = token ? { authtoken: token } : {}
+      const res = await axios.get(`/api/articles/${articleId}`, {
+        headers,
+      })
       setArticleInfo(res.data)
     }
     // setArticleInfo({ upvotes: 5, comments: [] })
