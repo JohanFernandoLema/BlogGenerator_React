@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb'
 import fs from 'fs'
 import admin from 'firebase-admin'
 
-const credentials = JSON.parse(fs.readFileSync('../credentials.json'))
+const credentials = JSON.parse(fs.readFileSync('./credentials.json'))
 admin.initializeApp({ credential: admin.credential.cert(credentials) })
 const app = express()
 
@@ -11,11 +11,13 @@ app.use(async (req, res, next) => {
   const { authtoken } = req.headers
   if (authtoken) {
     try {
-      const user = await admin.auth().verifyIdToken(authtoken)
+      req.user = await admin.auth().verifyIdToken(authtoken)
     } catch (error) {
-      res.sendStatus(400)
+      return res.sendStatus(400)
     }
   }
+
+  req.user = req.user || {}
   next()
 })
 
@@ -45,7 +47,7 @@ app.get('/api/articles/:name', async (req, res) => {
 
   if (article) {
     const upvoteIds = article.upvoteIds || []
-    article.canUpvote = uid && !upvoteIds.include(uid)
+    article.canUpvote = uid && !upvoteIds.includes(uid)
     res.json(article)
   } else {
     res.sendStatus(404)
@@ -71,7 +73,7 @@ app.put('/api/articles/:name/upvote', async (req, res) => {
   const db = client.db()
   if (article) {
     const upvoteIds = article.upvoteIds || []
-    const canUpvote = uid && !upvoteIds.include(uid)
+    const canUpvote = uid && !upvoteIds.includes(uid)
     if (canUpvote) {
       await db
         .collection('articles')
@@ -91,23 +93,25 @@ app.put('/api/articles/:name/upvote', async (req, res) => {
 
 app.post('/api/articles/:name/comments', async (req, res) => {
   const { name } = req.params
-  const { text } = req.body
+  const { postedBy, text } = req.body
   const { email } = req.user
 
   const client = new MongoClient('mongodb://127.0.0.1:27017/react-blog-db')
   client.connect()
 
   const db = client.db()
-  await db
-    .collection('articles')
-    .updateOne({ name }, { $push: { comments: { email, text } } })
-
+  await db.collection('articles').updateOne(
+    { name },
+    {
+      $push: { comments: { postedBy: email, text } },
+    }
+  )
   const article = await db.collection('articles').findOne({ name })
 
   if (article) {
     res.json(article)
   } else {
-    res.sendStatus(404)
+    res.send("That article doesn't exist!")
   }
 })
 // app.post('/hello', (req, res) => {

@@ -8,7 +8,12 @@ import AddComments from '../components/AddComments.js'
 import useUser from '../hooks/useUser'
 
 const ArticlePage = () => {
-  const [articleInfo, setArticleInfo] = useState({ upvotes: 0, comments: [] })
+  const [articleInfo, setArticleInfo] = useState({
+    upvotes: 0,
+    comments: [],
+    canUpvote: false,
+  })
+  const { canUpvote } = articleInfo
   const { articleId } = useParams()
 
   const { user, isLoading } = useUser()
@@ -23,15 +28,19 @@ const ArticlePage = () => {
       setArticleInfo(res.data)
     }
     // setArticleInfo({ upvotes: 5, comments: [] })
-    newArticleInfo()
-  }, [])
+    if (isLoading) {
+      newArticleInfo()
+    }
+  }, [isLoading, user])
 
   const article = articles.find((article) => article.name === articleId)
 
   const addUpvote = async () => {
     const token = user && (await user.getIdToken())
     const headers = token ? { authtoken: token } : {}
-    const res = await axios.put(`/api/articles/${articleId}/upvote`)
+    const res = await axios.put(`/api/articles/${articleId}/upvote`, null, {
+      headers,
+    })
     const updatedArticle = res.data
     setArticleInfo(updatedArticle)
   }
@@ -47,7 +56,9 @@ const ArticlePage = () => {
       <h1>{article.title}</h1>
       <div className="upvotes-section">
         {user ? (
-          <button onClick={addUpvote}>Upvote</button>
+          <button onClick={addUpvote}>
+            {canUpvote ? 'Upvote' : 'Already Upvoted'}
+          </button>
         ) : (
           <button>Login First</button>
         )}
